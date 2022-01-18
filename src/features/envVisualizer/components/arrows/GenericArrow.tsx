@@ -1,5 +1,5 @@
 import { KonvaEventObject } from 'konva/lib/Node';
-import { Arrow as KonvaArrow } from 'react-konva';
+import { Arrow as KonvaArrow, Group as KonvaGroup, Path as KonvaPath } from 'react-konva';
 
 import { Config, ShapeDefaultProps } from '../../EnvVisualizerConfig';
 import { Layout } from '../../EnvVisualizerLayout';
@@ -71,33 +71,34 @@ export class GenericArrow implements Visible, Hoverable {
     points.splice(0, 2); 
 
     return (
-      <KonvaArrow
+      <KonvaGroup
+        key={Layout.key++}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+      >
+      <KonvaPath
         {...ShapeDefaultProps}
         points={points}
         fill={Config.SA_WHITE.toString()}
         stroke={Config.SA_WHITE.toString()}
         strokeWidth={Number(Config.ArrowStrokeWidth)}
         hitStrokeWidth={Number(Config.ArrowHitStrokeWidth)}
-        key={Layout.key++}
-        onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
-        sceneFunc={function(ctx,shape){
+        sceneFunc={(ctx,shape) => {
           ctx.beginPath();
-          ctx.moveTo(points[0],points[1]);
+          ctx.moveTo(points[0], points[1]);
           if (points.length === 4) {
-              ctx.lineTo(points[2],points[3]);
+              ctx.lineTo(points[2], points[3]);
           } else {
-              const borderRadius = 40;
+              const cornerRadius = 40;
               let n = 0;
-                 
               while (n < points.length - 4) {
                   const dx1 = (points[n + 2] - points[n + 0]);
                   const dy1 = (points[n + 3] - points[n + 1]);
-                  const br1 = Math.min(borderRadius, Math.max(Math.abs(dx1 / 2),Math.abs(dy1 / 2)));
+                  const br1 = Math.min(cornerRadius, Math.max(Math.abs(dx1 / 2),Math.abs(dy1 / 2)));
   
                   const dx2 = (points[n + 2 + 2] - points[n + 0 + 2]);
                   const dy2 = (points[n + 3 + 2] - points[n + 1 + 2]);
-                  const br2 = Math.min(borderRadius, Math.max(Math.abs(dx2 / 2), Math.abs(dy2 / 2)));
+                  const br2 = Math.min(cornerRadius, Math.max(Math.abs(dx2 / 2), Math.abs(dy2 / 2)));
   
                   const br = Math.min(br1, br2);
   
@@ -111,19 +112,20 @@ export class GenericArrow implements Visible, Hoverable {
   
                   ctx.quadraticCurveTo(points[n + 0], points[n + 1], x2, y2);
               }
-              ctx.lineTo(points[points.length - 2],points[points.length - 1]);     
+              ctx.lineTo(points[points.length - 2], points[points.length - 1]);     
           }
-          const arrowLen = 10;   // length of arrow in pixels
-          const angle = Math.atan2(points[points.length - 1] - points[points.length - 3], 
-                                   points[points.length - 2] - points[points.length - 4]);
-          ctx.lineTo(points[points.length - 2] - arrowLen * Math.cos(angle - Math.PI / 6), 
-                     points[points.length - 1] - arrowLen * Math.sin(angle - Math.PI / 6));
-          ctx.moveTo(points[points.length - 2], points[points.length - 1]);
-          ctx.lineTo(points[points.length - 2] - arrowLen * Math.cos(angle + Math.PI / 6), 
-                     points[points.length - 1] - arrowLen * Math.sin(angle + Math.PI / 6));
           ctx.strokeShape(shape);
       }}
-      />
+      /> 
+      <KonvaArrow
+        {...ShapeDefaultProps}
+        points={points}
+        fill={Config.SA_WHITE.toString()}
+        stroke={Config.SA_WHITE.toString()}
+        strokeWidth={0}
+        hitStrokeWidth={0}
+        />
+        </KonvaGroup>
     );
   }
 }
