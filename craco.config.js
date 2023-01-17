@@ -39,6 +39,9 @@ const cracoConfig = (module.exports = {
         type: 'javascript/auto'
       });
 
+      // webpackConfig.output.hashFunction = 'sha256';
+      // https://stackoverflow.com/q/69692842/11536796
+
       return webpackConfig;
     }
   },
